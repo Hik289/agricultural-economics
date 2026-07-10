@@ -1,9 +1,8 @@
-"""Dual-LLM BSI coding (gpt-5.5 + claude-opus-4-x via OCPlatform proxy).
+"""Dual-pass model-assisted BSI coding.
 
 Strategy:
-1) Pass A — call OpenAI for ALL cases (fast, no contention with Anthropic).
-2) Pass B — call Anthropic for ALL cases, cascading opus-4-5 -> sonnet-4-5 ->
-   haiku-4-5 on persistent 429 (Phase-C panel agent burns ITPM on opus).
+1) Pass A — call the primary OpenAI-compatible model endpoint for all cases.
+2) Pass B — optionally call a secondary compatible proxy with a model cascade.
 3) Merge into cases_bsi_llm.jsonl + cases_bsi_llm.csv.
 
 Both passes resume from existing jsonl, so this script can be re-run safely.
@@ -24,16 +23,38 @@ from openai import OpenAI
 PROJECT_ROOT = Path("/home/user/projects/epvr-replication")
 PROCESSED = PROJECT_ROOT / "data" / "processed"
 
-ANTHROPIC_PROXY = "http://127.0.0.1:18801/v1/messages"
-ANTHROPIC_MODEL_CASCADE = ["claude-opus-4-5", "claude-sonnet-4-5", "claude-haiku-4-5"]
-OPENAI_MODEL = "gpt-5.5"
+PRIMARY_LLM_BASE_URL = os.environ.get("LLM_BASE_URL") or os.environ.get("OPENAI_BASE_URL")
+PRIMARY_LLM_MODEL = os.environ.get("LLM_MODEL") or os.environ.get("OPENAI_MODEL")
+SECONDARY_LLM_PROXY = os.environ.get("SECONDARY_LLM_PROXY_URL") or os.environ.get("ANTHROPIC_PROXY_URL", "")
+SECONDARY_LLM_MODELS = [
+    m.strip()
+    for m in (
+        os.environ.get("SECONDARY_LLM_MODELS")
+        or os.environ.get("ANTHROPIC_MODEL_CASCADE")
+        or ""
+    ).split(",")
+    if m.strip()
+]
 
-PRICE_PER_1K = {
-    "gpt-5.5": {"in": 0.005, "out": 0.015},
-    "claude-opus-4-5": {"in": 0.015, "out": 0.075},
-    "claude-sonnet-4-5": {"in": 0.003, "out": 0.015},
-    "claude-haiku-4-5": {"in": 0.0008, "out": 0.004},
-}
+
+def _estimate_cost_usd(
+    in_tok: int,
+    out_tok: int,
+    *,
+    in_env: str = "LLM_INPUT_PRICE_PER_1K",
+    out_env: str = "LLM_OUTPUT_PRICE_PER_1K",
+) -> float:
+    """Optional cost estimate; returns 0 when prices are not configured."""
+    try:
+        in_price = float(os.environ.get(in_env, "0"))
+        out_price = float(os.environ.get(out_env, "0"))
+    except ValueError:
+        return 0.0
+    return (in_tok / 1000) * in_price + (out_tok / 1000) * out_price
+
+
+def _primary_api_key() -> str | None:
+    return os.environ.get("LLM_API_KEY") or os.environ.get("OPENAI_API_KEY")
 
 POSITIVE_KEYS = [
     "farmer_dividend", "collective_dividend", "cooperative_participation",
@@ -145,9 +166,11 @@ def _validate(rec: dict) -> dict:
 # ---------------------------------------------------------------------------
 
 def call_openai(client: OpenAI, text: str) -> tuple[dict, float, dict]:
+    if not PRIMARY_LLM_MODEL:
+        return _empty("primary_model_not_configured"), 0.0, {}
     try:
         r = client.chat.completions.create(
-            model=OPENAI_MODEL,
+            model=PRIMARY_LLM_MODEL,
             max_completion_tokens=1800,
             response_format={"type": "json_object"},
             messages=[
@@ -162,16 +185,18 @@ def call_openai(client: OpenAI, text: str) -> tuple[dict, float, dict]:
     val = _validate(parsed) if "error" not in parsed else parsed
     in_tok = r.usage.prompt_tokens
     out_tok = r.usage.completion_tokens
-    usd = (in_tok / 1000) * PRICE_PER_1K[OPENAI_MODEL]["in"] + (out_tok / 1000) * PRICE_PER_1K[OPENAI_MODEL]["out"]
+    usd = _estimate_cost_usd(in_tok, out_tok)
     return val, usd, {"in": in_tok, "out": out_tok, "raw": raw[:500]}
 
 
 def _anthropic_post(model: str, text: str, max_tokens: int = 1100) -> tuple[int, str, dict]:
+    if not SECONDARY_LLM_PROXY:
+        return 0, "SECONDARY_LLM_PROXY_URL not configured", {}
     body = {"model": model, "max_tokens": max_tokens, "system": SYSTEM_PROMPT,
             "messages": [{"role": "user", "content": text[:5000]}]}
     try:
         r = requests.post(
-            ANTHROPIC_PROXY, json=body,
+            SECONDARY_LLM_PROXY, json=body,
             headers={"Content-Type": "application/json", "anthropic-version": "2023-06-01"},
             timeout=120,
         )
@@ -185,13 +210,15 @@ def _anthropic_post(model: str, text: str, max_tokens: int = 1100) -> tuple[int,
 
 
 def call_anthropic(text: str) -> tuple[dict, float, dict]:
-    # Adaptive cascade: try each model once, on 429 immediately fall through
-    # to the next.  Only retry within a single model on 5xx errors.
+    if not SECONDARY_LLM_MODELS:
+        return _empty("secondary_models_not_configured"), 0.0, {}
+    # Adaptive cascade: try each configured model once, on 429 immediately
+    # fall through to the next. Only retry within a single model on 5xx errors.
     last_status = 0
     last_body = ""
     data: dict = {}
-    used_model = ANTHROPIC_MODEL_CASCADE[0]
-    for model in ANTHROPIC_MODEL_CASCADE:
+    used_model = SECONDARY_LLM_MODELS[0]
+    for model in SECONDARY_LLM_MODELS:
         used_model = model
         s, b, data = _anthropic_post(model, text)
         last_status, last_body = s, b
@@ -208,10 +235,10 @@ def call_anthropic(text: str) -> tuple[dict, float, dict]:
                 break
             continue
         break
-    # If all three were 429, wait 30s and retry haiku once more.
+    # If the whole cascade returns 429, wait and retry the last configured model once.
     if last_status == 429:
         time.sleep(30)
-        used_model = "claude-haiku-4-5"
+        used_model = SECONDARY_LLM_MODELS[-1]
         s, b, data = _anthropic_post(used_model, text)
         last_status, last_body = s, b
     if last_status != 200:
@@ -223,8 +250,12 @@ def call_anthropic(text: str) -> tuple[dict, float, dict]:
     usage = data.get("usage", {})
     in_tok = usage.get("input_tokens", 0)
     out_tok = usage.get("output_tokens", 0)
-    price = PRICE_PER_1K.get(used_model, PRICE_PER_1K["claude-opus-4-5"])
-    usd = (in_tok / 1000) * price["in"] + (out_tok / 1000) * price["out"]
+    usd = _estimate_cost_usd(
+        in_tok,
+        out_tok,
+        in_env="SECONDARY_LLM_INPUT_PRICE_PER_1K",
+        out_env="SECONDARY_LLM_OUTPUT_PRICE_PER_1K",
+    )
     return val, usd, {"in": in_tok, "out": out_tok, "raw": text_out[:500], "model": used_model}
 
 
@@ -259,8 +290,13 @@ def main() -> int:
     ap.add_argument("--budget-usd", type=float, default=15.0)
     ap.add_argument("--soft-budget-usd", type=float, default=5.0)
     ap.add_argument("--limit", type=int, default=10000)
-    ap.add_argument("--phase", choices=["both", "openai", "anthropic", "merge"], default="both")
+    ap.add_argument(
+        "--phase",
+        choices=["both", "primary", "secondary", "openai", "anthropic", "merge"],
+        default="both",
+    )
     args = ap.parse_args()
+    phase = {"openai": "primary", "anthropic": "secondary"}.get(args.phase, args.phase)
 
     src = PROCESSED / "cases_dedup.csv"
     if not src.exists():
@@ -274,8 +310,16 @@ def main() -> int:
     print(f"  resume: oai_cached={len(oai_cache)} ant_cached={len(ant_cache)}")
 
     total_usd = 0.0
-    if args.phase in ("both", "openai"):
-        client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    if phase in ("both", "primary"):
+        api_key = _primary_api_key()
+        if not api_key:
+            print("missing LLM_API_KEY"); return 1
+        if not PRIMARY_LLM_MODEL:
+            print("missing LLM_MODEL"); return 1
+        client_kwargs = {"api_key": api_key}
+        if PRIMARY_LLM_BASE_URL:
+            client_kwargs["base_url"] = PRIMARY_LLM_BASE_URL
+        client = OpenAI(**client_kwargs)
         for i, row in enumerate(cases):
             cid = row["case_id"]
             if cid in oai_cache:
@@ -297,7 +341,11 @@ def main() -> int:
             time.sleep(0.2)
         print(f"  oai done; total usd ≈ {total_usd:.3f}")
 
-    if args.phase in ("both", "anthropic"):
+    if phase in ("both", "secondary"):
+        if not SECONDARY_LLM_PROXY:
+            print("missing SECONDARY_LLM_PROXY_URL"); return 1
+        if not SECONDARY_LLM_MODELS:
+            print("missing SECONDARY_LLM_MODELS"); return 1
         for i, row in enumerate(cases):
             cid = row["case_id"]
             if cid in ant_cache:

@@ -246,7 +246,9 @@ def is_official(host: str) -> int:
 
 
 def brave_search(query: str, count: int = 20, offset: int = 0, freshness: Optional[str] = None) -> list[dict]:
-    key = os.environ.get("BRAVE_API_KEY", "BSA5JKAPj6u6qyLS4kj_wv4BVh2dUSZ")
+    key = os.environ.get("SEARCH_API_KEY") or os.environ.get("BRAVE_API_KEY")
+    if not key:
+        return []
     headers = {"Accept": "application/json", "X-Subscription-Token": key}
     params = {"q": query, "count": min(count, 20), "offset": offset, "country": "CN", "search_lang": "zh-hans"}
     if freshness:

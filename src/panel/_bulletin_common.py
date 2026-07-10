@@ -192,7 +192,9 @@ def fetch(url: str, level: str, geo_code: str, year: int, kind: str = "html") ->
 
 
 def brave_search(query: str, count: int = 10) -> list[dict]:
-    key = os.environ.get("BRAVE_API_KEY", "BSA5JKAPj6u6qyLS4kj_wv4BVh2dUSZ")
+    key = os.environ.get("SEARCH_API_KEY") or os.environ.get("BRAVE_API_KEY")
+    if not key:
+        return []
     headers = {"Accept": "application/json", "X-Subscription-Token": key}
     params = {"q": query, "count": min(count, 20), "country": "CN", "search_lang": "zh-hans"}
     time.sleep(1.1)

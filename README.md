@@ -1,14 +1,6 @@
 # EPVR Benefit-Sharing Replication Package
 
 <p align="center">
-  <a href="#replication-steps"><img src="https://img.shields.io/badge/replication-4%20steps-2ea44f" alt="Replication steps"></a>
-  <a href="#intuition"><img src="https://img.shields.io/badge/intuition-capture--risk%20support%20map-7c3aed" alt="Intuition"></a>
-  <a href="#api-requirements"><img src="https://img.shields.io/badge/API-optional-f97316" alt="API optional"></a>
-  <a href="#repository-structure"><img src="https://img.shields.io/badge/modules-crawler%20%7C%20BSI%20%7C%20panel%20%7C%20DID-2563eb" alt="Repository modules"></a>
-  <a href="#citation"><img src="https://img.shields.io/badge/citation-Land%20Use%20Policy-64748b" alt="Citation"></a>
-</p>
-
-<p align="center">
   <img src="https://img.shields.io/badge/python-3.9%2B-blue" alt="Python 3.9+">
   <img src="https://img.shields.io/badge/method-staggered%20DID-lightgrey" alt="Staggered DID">
   <img src="https://img.shields.io/badge/index-BSI%2012%20indicators-lightgrey" alt="BSI index">
@@ -41,15 +33,15 @@ The capture-risk analysis relies on uneven provincial case support. Hubei has pr
 
 Short answer: **the main empirical replication does not require model API keys**.
 
-Use the companion processed data package if you only want to reproduce the province-year panel, DID tables, robustness checks, and publication figures. The scripts under `src/empirical/` run on local CSV inputs and do not call OpenAI, Anthropic, or any LLM service.
+Use the companion processed data package if you only want to reproduce the province-year panel, DID tables, robustness checks, and publication figures. The scripts under `src/empirical/` run on local CSV inputs and do not call external model APIs.
 
 APIs are needed only for optional reconstruction steps:
 
-- **OpenAI API**: required only if you rerun `src/bsi_coding/llm_assisted_coding.py` with `--phase openai` or `--phase both`. That script reads `OPENAI_API_KEY`.
-- **Anthropic path**: the current script does **not** read `ANTHROPIC_API_KEY` directly. It posts to a local Anthropic-compatible proxy at `http://127.0.0.1:18801/v1/messages`, so it is optional and only relevant if you run that local proxy and choose `--phase anthropic` or `--phase both`.
-- **Brave Search API**: only relevant for the government search crawlers, such as `src/crawler/crawl_gov_search.py` and `src/crawler/crawl_gov_search_more.py`. If you start from the companion raw/processed data, skip these crawlers.
+- **Primary model API**: required only if you rerun `src/bsi_coding/llm_assisted_coding.py` with `--phase primary` or `--phase both`. Set `LLM_API_KEY`; optionally set `LLM_BASE_URL` and `LLM_MODEL`.
+- **Secondary model proxy**: optional second-pass coding path. Set `SECONDARY_LLM_PROXY_URL` and `SECONDARY_LLM_MODELS` only if you run a compatible local proxy and choose `--phase secondary` or `--phase both`.
+- **Search API**: only relevant for the government search crawlers, such as `src/crawler/crawl_gov_search.py` and `src/crawler/crawl_gov_search_more.py`. Set `SEARCH_API_KEY` if you run those crawlers. If you start from the companion raw/processed data, skip these crawlers.
 
-The deterministic rule-based BSI coder, panel construction, and empirical estimators do not require model API keys. The `openai` and `anthropic` Python packages are listed in `requirements.txt` because the repository includes the optional LLM-assisted coding workflow.
+The deterministic rule-based BSI coder, panel construction, and empirical estimators do not require model API keys. The model-client Python packages are listed in `requirements.txt` because the repository includes the optional LLM-assisted coding workflow.
 
 ## Repository Structure
 
@@ -81,7 +73,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Key packages include `pandas`, `numpy`, `statsmodels`, `linearmodels`, `pyfixest`, `csdid`, `requests`, `beautifulsoup4`, `openai`, and `anthropic`.
+Key packages include `pandas`, `numpy`, `statsmodels`, `linearmodels`, `pyfixest`, `csdid`, `requests`, `beautifulsoup4`, and optional model-client libraries.
 
 ## Replication Steps
 
@@ -111,11 +103,15 @@ python src/bsi_coding/code_bsi_rules.py
 Optional LLM-assisted coding requires API/proxy setup:
 
 ```bash
-export OPENAI_API_KEY="YOUR_API_KEY_HERE"
-python src/bsi_coding/llm_assisted_coding.py --phase openai
+export LLM_API_KEY="your-api-key"
+export LLM_BASE_URL="https://your-compatible-endpoint/v1"
+export LLM_MODEL="your-model-name"
+python src/bsi_coding/llm_assisted_coding.py --phase primary
 
-# Optional only if a local Anthropic-compatible proxy is running:
-python src/bsi_coding/llm_assisted_coding.py --phase anthropic
+# Optional only if a compatible secondary proxy is running:
+export SECONDARY_LLM_PROXY_URL="https://your-secondary-proxy/v1/messages"
+export SECONDARY_LLM_MODELS="model-a,model-b"
+python src/bsi_coding/llm_assisted_coding.py --phase secondary
 python src/bsi_coding/llm_assisted_coding.py --phase merge
 ```
 
@@ -169,14 +165,16 @@ Expected outputs: `analysis/tables/` and `analysis/figures/`.
 No API keys are needed for the main empirical replication. Set API variables only for optional reconstruction workflows:
 
 ```bash
-# Optional: rerun OpenAI-assisted BSI coding
-export OPENAI_API_KEY="YOUR_API_KEY_HERE"
+# Optional: rerun model-assisted BSI coding
+export LLM_API_KEY="your-api-key"
+export LLM_BASE_URL="https://your-compatible-endpoint/v1"
+export LLM_MODEL="your-model-name"
 
-# Optional: rerun Brave-based discovery crawlers
-export BRAVE_API_KEY="YOUR_BRAVE_SEARCH_KEY_HERE"
+# Optional: rerun search-based discovery crawlers
+export SEARCH_API_KEY="your-search-api-key"
 ```
 
-For Anthropic-assisted coding, run a local Anthropic-compatible proxy at `http://127.0.0.1:18801/v1/messages`; the current script does not consume `ANTHROPIC_API_KEY` directly.
+For secondary model-assisted coding, set `SECONDARY_LLM_PROXY_URL` and `SECONDARY_LLM_MODELS` for your compatible local proxy.
 
 Do not commit real API keys, proxy credentials, or local credential files.
 
