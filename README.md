@@ -2,8 +2,6 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/python-3.9%2B-blue" alt="Python 3.9+">
-  <img src="https://img.shields.io/badge/method-staggered%20DID-lightgrey" alt="Staggered DID">
-  <img src="https://img.shields.io/badge/index-BSI%2012%20indicators-lightgrey" alt="BSI index">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT license">
 </p>
 
