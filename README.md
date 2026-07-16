@@ -11,7 +11,13 @@ This repository contains replication code and analysis for the paper:
 
 We develop a **Benefit-Sharing Institution Index (BSI)** from 168 EPVR policy cases, construct a province-year panel (2015-2024), and estimate distributional effects using staggered difference-in-differences.
 
-## Intuition
+## At a Glance
+
+- **Research question.** How do benefit-sharing institutions shape distributional outcomes in China's EPVR markets?
+- **Core idea.** The replication package builds a Benefit-Sharing Institution Index and estimates staggered difference-in-differences effects.
+- **What is included.** Crawlers, BSI coding pipelines, panel construction, empirical estimators, robustness checks, and data-availability notes.
+
+## Motivation
 
 <p align="center">
   <img src="analysis/figures/figure2_capture_support_map.png" width="800" alt="Capture-risk case-support map">
@@ -19,7 +25,7 @@ We develop a **Benefit-Sharing Institution Index (BSI)** from 168 EPVR policy ca
 
 The capture-risk analysis relies on uneven provincial case support. Hubei has pre/post support for capture-risk comparisons, while Yunnan, Guangdong, and Fujian provide sparse support cases. The map makes the empirical support structure visible before the DID and robustness exercises.
 
-## Highlights
+## Key Contributions
 
 - Benefit-Sharing Institution Index built from 168 EPVR policy cases and 12 indicators.
 - Triple-source BSI coding pipeline: rule-based coding, LLM-assisted coding, and automated cross-validation.
@@ -152,7 +158,7 @@ python src/empirical/make_lup_figures.py
 
 Expected outputs: `analysis/tables/` and `analysis/figures/`.
 
-## Data Availability
+## Data and Availability
 
 - Province-level panel data: available in `epvr-benefit-sharing-data/` through the companion data package.
 - Raw HTML/PDF documents: available upon request because government publications may carry copyright restrictions.
