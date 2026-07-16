@@ -66,7 +66,9 @@ The deterministic rule-based BSI coder, panel construction, and empirical estima
 `-- paper/                       # Manuscript artifacts
 ```
 
-## Requirements
+## Quick Start
+
+### Requirements
 
 ```bash
 git clone git@github.com:Hik289/agricultural-economics.git
