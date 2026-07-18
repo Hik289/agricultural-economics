@@ -81,7 +81,7 @@ pip install -r requirements.txt
 
 Key packages include `pandas`, `numpy`, `statsmodels`, `linearmodels`, `pyfixest`, `csdid`, `requests`, `beautifulsoup4`, and optional model-client libraries.
 
-## Replication Steps
+## Reproducing Results
 
 For most replication use cases, start from the companion data package and run Step 3 and Step 4. Steps 1 and 2 rebuild the dataset and coding pipeline from raw documents; those are optional and may require web access or LLM calls depending on how far you rebuild.
 
