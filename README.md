@@ -184,6 +184,10 @@ For secondary model-assisted coding, set `SECONDARY_LLM_PROXY_URL` and `SECONDAR
 
 Do not commit real API keys, proxy credentials, or local credential files.
 
+## Reviewer Guide
+
+For a reviewer-oriented map of smoke checks, paper-scale entry points, data boundaries, and reporting metadata, see [Artifact Guide](docs/ARTIFACT.md).
+
 ## Artifact Checklist
 
 - **Code release.** Core implementations, configuration files, and reproduction entry points are versioned in this repository.
