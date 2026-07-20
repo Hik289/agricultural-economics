@@ -1,7 +1,7 @@
 # EPVR Benefit-Sharing Replication Package
 
 <p align="center">
-  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT license">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT license"></a>
   <a href="requirements.txt"><img src="https://img.shields.io/badge/Python-3.9%2B-3776AB.svg" alt="Python 3.9+"></a>
 </p>
 
@@ -183,6 +183,13 @@ export SEARCH_API_KEY="your-search-api-key"
 For secondary model-assisted coding, set `SECONDARY_LLM_PROXY_URL` and `SECONDARY_LLM_MODELS` for your compatible local proxy.
 
 Do not commit real API keys, proxy credentials, or local credential files.
+
+## Artifact Checklist
+
+- **Code release.** Core implementations, configuration files, and reproduction entry points are versioned in this repository.
+- **Reproducibility.** Start with the smoke or quick-start path before paper-scale runs; record the commit hash, Python version, backend/model identifiers, seeds, and command-line arguments.
+- **Data and credentials.** Large datasets, benchmark downloads, generated outputs, and API keys are intentionally excluded. Use the data and configuration notes above to recreate them or point to local copies.
+- **Reporting.** For paper-scale runs, keep raw run folders immutable and regenerate tables or figures from the logged artifacts with the listed analysis scripts.
 
 ## Citation
 
