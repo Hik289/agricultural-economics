@@ -20,7 +20,7 @@ MANIFEST = PROJECT_ROOT / "data" / "external" / "bulletins" / "manifest.jsonl"
 WB_DIR.mkdir(parents=True, exist_ok=True)
 
 JST = timezone(timedelta(hours=9))
-UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0 Research-Lab academic"
+UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0 academic"
 HEADERS = {"User-Agent": UA, "Accept": "text/html,*/*;q=0.8"}
 
 PREFECTURE_HOSTS = {

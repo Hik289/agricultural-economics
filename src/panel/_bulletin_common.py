@@ -36,7 +36,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 UA = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
     "Chrome/120.0.0.0 Safari/537.36 "
-    "(Research-Lab academic-research-crawler; contact [REDACTED])"
+    "(academic-research-crawler; contact [REDACTED])"
 )
 HEADERS = {
     "User-Agent": UA,
