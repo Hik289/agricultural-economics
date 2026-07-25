@@ -74,7 +74,7 @@ def main() -> int:
                 print(f"   ok -> {rec['path']}", flush=True)
                 break
         else:
-            print(f"   all candidates failed", flush=True)
+            print("   all candidates failed", flush=True)
     print(f"\nDONE gapfill fetched={fetched}", flush=True)
     return 0
 

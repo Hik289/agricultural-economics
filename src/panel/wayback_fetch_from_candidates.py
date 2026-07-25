@@ -7,14 +7,13 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-import sys
 import time
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 import requests
 
-PROJECT_ROOT = Path("/home/user/projects/epvr-replication")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 WB_DIR = PROJECT_ROOT / "data" / "external" / "bulletins_wayback"
 MANIFEST = PROJECT_ROOT / "data" / "external" / "bulletins" / "manifest.jsonl"
 WB_DIR.mkdir(parents=True, exist_ok=True)
@@ -224,7 +223,7 @@ def main() -> int:
                 found = True
                 break
             if not found:
-                log.append(f"  all candidates failed for {code}/{y}"); print(f"  all candidates failed", flush=True)
+                log.append(f"  all candidates failed for {code}/{y}"); print("  all candidates failed", flush=True)
         if time.time() - start_time > HARD_DEADLINE_S:
             break
 

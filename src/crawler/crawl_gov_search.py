@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from _common import brave_search, fetch_html, LOG_DIR  # noqa: E402
+from _common import PROJECT_ROOT, brave_search, fetch_html, LOG_DIR  # noqa: E402
 
 SEARCH_QUERIES = [
     "site:mnr.gov.cn 生态产品价值实现 典型案例",
@@ -73,7 +73,7 @@ def main() -> int:
             log.append(f"[page-skip] {u}")
 
     # PDF candidates → for download_pdfs.py.  Persist URLs to disk.
-    pdf_queue_path = Path("/home/user/projects/epvr-replication/data/_pdf_queue_from_search.jsonl")
+    pdf_queue_path = PROJECT_ROOT / "data" / "_pdf_queue_from_search.jsonl"
     with pdf_queue_path.open("w", encoding="utf-8") as f:
         for u, title in candidates_pdfs.items():
             f.write(json.dumps({"url": u, "title": title}, ensure_ascii=False) + "\n")

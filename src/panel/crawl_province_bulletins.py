@@ -19,7 +19,7 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 
 sys.path.insert(0, str(Path(__file__).parent))
-from _bulletin_common import fetch, brave_search, _decode, _domain, HEADERS, LOG_DIR  # noqa: E402
+from _bulletin_common import fetch, brave_search, _decode, HEADERS, LOG_DIR  # noqa: E402
 import requests
 
 PROVINCES: list[tuple[str, str, list[str]]] = [

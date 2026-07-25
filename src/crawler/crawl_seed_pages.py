@@ -19,6 +19,7 @@ from bs4 import BeautifulSoup
 
 sys.path.insert(0, str(Path(__file__).parent))
 from _common import (  # noqa: E402
+    PROJECT_ROOT,
     fetch_html,
     LOG_DIR,
     is_official,
@@ -103,7 +104,9 @@ def main() -> int:
             # follow children
             if depth < MAX_DEPTH:
                 try:
-                    html_text = Path("/home/user/projects/epvr-replication" + "/" + rec["html_path"]).read_text(encoding="utf-8", errors="replace")
+                    html_text = (PROJECT_ROOT / rec["html_path"]).read_text(
+                        encoding="utf-8", errors="replace"
+                    )
                 except Exception:
                     html_text = ""
                 children = _extract_children(rec.get("final_url", url), html_text)

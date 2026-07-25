@@ -25,7 +25,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from statistics import median
 
-PROJECT_ROOT = Path("/home/user/projects/epvr-replication")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 PROCESSED = PROJECT_ROOT / "data" / "processed"
 DOCS = PROJECT_ROOT / "docs"
 
@@ -95,7 +95,6 @@ def main() -> int:
 
     print(f"validate: cases={len(cases)} rules={len(rules)} llm={len(llm_csv)}")
 
-    final_rows: list[dict] = []
     stats: dict = {
         "total": 0,
         "auto_pass": 0,
@@ -325,7 +324,7 @@ def main() -> int:
     report = []
     report.append("# Auto-Validation Report — EPVR Case BSI Coding")
     report.append("")
-    report.append(f"- Dataset version: phase_B_run_001")
+    report.append("- Dataset version: phase_B_run_001")
     report.append(f"- Median BSI_net (cutoff for BSI_high): **{median_net}**")
     secondary_model_counts = Counter(r.get("anthropic_model_used", "") for r in _load_csv(PROCESSED / "cases_bsi_llm.csv"))
     secondary_model_summary = ", ".join(f"{m or '<empty>'}: {n}" for m, n in secondary_model_counts.most_common())

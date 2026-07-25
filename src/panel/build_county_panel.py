@@ -12,8 +12,8 @@ Logic:
   1. Build crosswalk: 6-digit county_code → (county_name, prefecture, province).
   2. Cross-join with year ∈ 2015..2024 (spec §3.2 minimum coverage).
   3. Fill all numeric socio-economic columns with NaN (NA_NOT_REPORTED equivalent).
-     We DO NOT fabricate values. The Director / Phase D must supply licensed
-     yearbook extractions before estimation.
+     The skeleton deliberately does not fabricate values; licensed yearbook
+     extractions must be supplied before estimation.
   4. Set restricted_or_licensed = 0 by row since no licensed values have been
      loaded yet. When licensed yearbook data is plugged in for specific rows,
      set this flag to 1 on those rows.
@@ -27,7 +27,6 @@ and written to data/processed/county_panel.csv.
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 import pandas as pd
 

@@ -156,7 +156,7 @@ def m2(panel):
 # M3: Leave-one-province-out for capture-risk β3
 # ---------------------------------------------------------------------------
 def m3(panel):
-    log = [f"=== M3: LOPO for Table 3b fe_controls (β3 on epvr × cr_high) ===",
+    log = ["=== M3: LOPO for Table 3b fe_controls (β3 on epvr × cr_high) ===",
            f"capture-risk-high provinces: {CAPTURE_RISK_HIGH}", ""]
     print(log[0])
 

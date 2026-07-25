@@ -4,7 +4,7 @@ import csv
 from collections import defaultdict
 from pathlib import Path
 
-PROJECT_ROOT = Path("/home/user/projects/epvr-replication")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 PROCESSED = PROJECT_ROOT / "data" / "processed"
 DOCS = PROJECT_ROOT / "docs"
 

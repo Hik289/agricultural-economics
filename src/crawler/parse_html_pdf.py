@@ -13,7 +13,7 @@ import hashlib
 import json
 import re
 import sys
-from dataclasses import dataclass, asdict, field
+from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Optional
 

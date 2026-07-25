@@ -23,7 +23,7 @@ from bs4 import BeautifulSoup
 sys.path.insert(0, str(Path(__file__).parent))
 from parse_bulletin import extract, VARIABLE_RULES  # noqa: E402
 
-PROJECT_ROOT = Path("/home/user/projects/epvr-replication")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 EXT_DIR = PROJECT_ROOT / "data" / "external" / "bulletins"
 MANIFEST = EXT_DIR / "manifest.jsonl"
 PROCESSED = PROJECT_ROOT / "data" / "processed"

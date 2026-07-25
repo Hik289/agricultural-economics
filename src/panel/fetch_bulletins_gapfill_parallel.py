@@ -6,7 +6,6 @@ import concurrent.futures as cf
 import json
 import sys
 import threading
-import time
 from collections import defaultdict
 from pathlib import Path
 

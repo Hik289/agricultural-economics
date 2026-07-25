@@ -2,13 +2,11 @@
 Output to analysis/figures/ as PDF + PNG (≥300 DPI).
 """
 from __future__ import annotations
-import os
 from pathlib import Path
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyBboxPatch
 
 ROOT = Path(__file__).resolve().parents[2]
 TBL  = ROOT / "analysis" / "tables"

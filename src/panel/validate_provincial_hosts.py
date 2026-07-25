@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from parse_bulletin import extract, VARIABLE_RULES  # noqa: E402
 from _bulletin_common import MANIFEST  # noqa: E402
 
-PROJECT_ROOT = Path("/home/user/projects/epvr-replication")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 PROCESSED = PROJECT_ROOT / "data" / "processed"
 
 # Allowed provincial-level host patterns.  Two formats:

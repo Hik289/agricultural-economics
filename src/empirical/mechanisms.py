@@ -1,6 +1,4 @@
 """Phase D — D10: Mechanism channels."""
-import sys
-sys.path.insert(0, '/home/user/projects/epvr-replication/src/empirical')
 from pathlib import Path
 import warnings
 import numpy as np
@@ -9,7 +7,7 @@ import pyfixest as pf
 
 warnings.filterwarnings("ignore")
 
-ROOT = Path('/home/user/projects/epvr-replication')
+ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "analysis"
 TAB = OUT / "tables"
 LOG = OUT / "logs"

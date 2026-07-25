@@ -8,12 +8,11 @@ import concurrent.futures as cf
 import json
 import sys
 import threading
-import time
 from collections import defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from _bulletin_common import fetch, manifest_append, _domain, MANIFEST, LOG_DIR  # noqa: E402
+from _bulletin_common import fetch, _domain, MANIFEST, LOG_DIR  # noqa: E402
 
 
 def _already_have(geo_code: str, year: int, level: str) -> bool:

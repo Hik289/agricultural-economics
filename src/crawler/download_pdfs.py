@@ -14,7 +14,7 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 
 sys.path.insert(0, str(Path(__file__).parent))
-from _common import fetch_pdf, LOG_DIR, RAW_HTML, CRAWL_INDEX  # noqa: E402
+from _common import PROJECT_ROOT, fetch_pdf, LOG_DIR, RAW_HTML, CRAWL_INDEX  # noqa: E402
 
 PDF_HREF_RE = re.compile(r"\.pdf(\?|$)", re.I)
 
@@ -62,7 +62,7 @@ def main() -> int:
             pdf_urls.setdefault(abs_url, rel)
 
     # 2) Brave-discovered PDF queue
-    queue_path = Path("/home/user/projects/epvr-replication/data/_pdf_queue_from_search.jsonl")
+    queue_path = PROJECT_ROOT / "data" / "_pdf_queue_from_search.jsonl"
     if queue_path.exists():
         for line in queue_path.read_text(encoding="utf-8").splitlines():
             try:

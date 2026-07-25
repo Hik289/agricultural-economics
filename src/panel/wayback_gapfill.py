@@ -15,16 +15,14 @@ Strategy:
 from __future__ import annotations
 import hashlib
 import json
-import os
 import re
-import sys
 import time
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 import requests
 
-PROJECT_ROOT = Path("/home/user/projects/epvr-replication")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 WB_DIR = PROJECT_ROOT / "data" / "external" / "bulletins_wayback"
 MANIFEST = PROJECT_ROOT / "data" / "external" / "bulletins" / "manifest.jsonl"
 LOG_DIR = PROJECT_ROOT / "analysis" / "logs"
@@ -136,7 +134,7 @@ def wb_available(url: str, timestamp: str = "") -> dict | None:
         if timestamp:
             params["timestamp"] = timestamp
         r = requests.get("https://archive.org/wayback/available", params=params, headers=HEADERS, timeout=25)
-    except Exception as e:
+    except Exception:
         return None
     if r.status_code != 200:
         return None
@@ -160,7 +158,7 @@ def wb_cdx(url_pattern: str, max_attempts: int = 4) -> list[tuple[str, str]]:
     for attempt in range(max_attempts):
         try:
             r = requests.get(api, params=params, headers=HEADERS, timeout=60)
-        except Exception as e:
+        except Exception:
             time.sleep(8 * (attempt + 1))
             continue
         if r.status_code == 200:
@@ -281,7 +279,7 @@ def main() -> int:
     HARD_DEADLINE_S = 90 * 60  # 90 min hard cap; leave 10 min for merge+report
 
     # Phase 1: known URLs.
-    log.append(f"=== PHASE 1: known URLs ===")
+    log.append("=== PHASE 1: known URLs ===")
     for code in TARGET_PROVINCES:
         for y in YEARS:
             if time.time() - start_time > HARD_DEADLINE_S:
@@ -300,7 +298,7 @@ def main() -> int:
             break
 
     # Phase 2: CDX discovery (more expensive but broader)
-    log.append(f"\n=== PHASE 2: CDX discovery ===")
+    log.append("\n=== PHASE 2: CDX discovery ===")
     for code in TARGET_PROVINCES:
         if time.time() - start_time > HARD_DEADLINE_S:
             break

@@ -24,7 +24,7 @@ from urllib.robotparser import RobotFileParser
 # JST per SOUL.md.
 JST = timezone(timedelta(hours=9))
 
-PROJECT_ROOT = Path("/home/user/projects/epvr-replication")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "data"
 RAW_HTML = DATA_DIR / "raw_html"
 RAW_PDF = DATA_DIR / "raw_pdf"

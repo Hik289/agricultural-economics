@@ -10,12 +10,10 @@ sentences, and the composite BSI_raw/capture_risk/BSI_net.
 """
 from __future__ import annotations
 import csv
-import json
 import re
-import sys
 from pathlib import Path
 
-PROJECT_ROOT = Path("/home/user/projects/epvr-replication")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 PROCESSED = PROJECT_ROOT / "data" / "processed"
 
 # Each rule is (indicator, list_of_(positive_regex, negative_regex_or_None)).

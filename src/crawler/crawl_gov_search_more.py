@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from _common import brave_search, fetch_html, LOG_DIR  # noqa: E402
+from _common import PROJECT_ROOT, brave_search, fetch_html, LOG_DIR  # noqa: E402
 
 EXTRA_QUERIES = [
     # 5-province batch hunt for typical-case PDFs
@@ -65,7 +65,7 @@ def main() -> int:
         else:
             log.append(f"[page-skip] {u}")
     # merge PDFs into the queue file
-    queue_path = Path("/home/user/projects/epvr-replication/data/_pdf_queue_from_search.jsonl")
+    queue_path = PROJECT_ROOT / "data" / "_pdf_queue_from_search.jsonl"
     with queue_path.open("a", encoding="utf-8") as f:
         for u, title in pdf_cands.items():
             f.write(json.dumps({"url": u, "title": title}, ensure_ascii=False) + "\n")

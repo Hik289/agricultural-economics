@@ -112,7 +112,7 @@ def wild_cluster_p(panel, outcome, term, formula_extra="", controls=None, reps=9
                 if k in wb.index:
                     return float(wb[k])
         return float(wb)
-    except Exception as e:
+    except Exception:
         return np.nan
 
 

@@ -59,12 +59,14 @@ The deterministic rule-based BSI coder, panel construction, and empirical estima
 |   |-- panel/                   # Province-year panel construction
 |   `-- empirical/               # DID estimation and robustness
 |-- analysis/
-|   |-- tables/                  # Output tables
-|   `-- figures/                 # Publication figures
+|   `-- figures/                 # Tracked publication figure
 |       `-- figure2_capture_support_map.png
-|-- docs/                        # Coding protocol, data dictionary, identification notes
-`-- paper/                       # Manuscript artifacts
+`-- docs/
+    `-- ARTIFACT.md              # Reproduction and data-boundary notes
 ```
+
+Analysis scripts create the untracked output directories, including
+`analysis/tables/` and `analysis/logs/`, when their required data are present.
 
 ## Quick Start
 

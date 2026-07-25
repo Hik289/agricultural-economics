@@ -22,7 +22,6 @@ Each extracted value carries its evidence sentence so the value is auditable.
 from __future__ import annotations
 import json
 import re
-from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Optional
 
@@ -277,7 +276,7 @@ def extract(text: str) -> dict[str, dict]:
 
 
 def main() -> int:
-    import argparse, sys
+    import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("path")
     args = ap.parse_args()

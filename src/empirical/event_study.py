@@ -11,7 +11,6 @@ Plot pre/post coefficients.
 """
 from pathlib import Path
 import warnings
-import numpy as np
 import pandas as pd
 import pyfixest as pf
 import matplotlib.pyplot as plt
@@ -96,7 +95,7 @@ def main():
     df["ci_lo"] = df["ci_lo"].round(4)
     df["ci_hi"] = df["ci_hi"].round(4)
     df.to_csv(TAB / "table4_event_study.csv", index=False)
-    log.append(f"\nEvent-study coefficients (relative to k=-1):")
+    log.append("\nEvent-study coefficients (relative to k=-1):")
     log.append(df.to_string(index=False))
 
     # Plot

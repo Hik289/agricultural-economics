@@ -3,7 +3,7 @@ Phase C2 — Build the remote sensing panel (NDVI + nighttime lights).
 
 This script DOES NOT fabricate numerical values. It attempts the standard
 public pipelines; if any required input (county polygon shapefile, MODIS
-NDVI tiles, VIIRS annual composites) cannot be obtained within the sandbox,
+NDVI tiles, VIIRS annual composites) is unavailable,
 the corresponding column is left as NaN and the gap is documented in
 docs/remote_sensing_unavailable.md.
 
@@ -12,7 +12,7 @@ Pipelines attempted (priority order):
   NDVI:
     1. Pre-aggregated county-level NDVI dataset from
        Resource and Environment Science Data Center (resdc.cn).
-       → Requires user registration + login; cannot be scripted in this sandbox.
+       → Requires user registration and an authenticated download.
     2. MODIS MOD13Q1 annual tiles from NASA EarthData LPDAAC.
        → Requires EarthData Login credentials.
     3. Google Earth Engine zonal reductions.
@@ -32,16 +32,15 @@ Pipelines attempted (priority order):
     3. OpenStreetMap county boundaries via Overpass.
        → Public but very heavy; quality varies.
 
-In this sandbox we attempted (1) confirming the NOAA NGDC endpoint is
-reachable but did not download multi-GB VIIRS rasters because:
+The repository does not download the multi-GB VIIRS rasters automatically
+because:
   (a) without a county shapefile + GEE/GDAL pipeline the zonal mean cannot
       be computed honestly, and
-  (b) the project budget for Phase C is ~5–10 hours total and a real raster
-      pipeline easily exceeds that just for one year × one product.
+  (b) a complete raster pipeline requires substantial storage and compute.
 
 Therefore this script emits an EMPTY (NaN-filled) remote-sensing panel keyed
-by (county_code, year). The Director should plug in a properly computed
-table here when GEE or local raster infrastructure is available.
+by (county_code, year). Supply a properly computed table before using these
+variables in empirical analysis.
 """
 
 from __future__ import annotations
@@ -74,7 +73,7 @@ def build_skeleton() -> pd.DataFrame:
 def write_unavailability_note():
     note = DOCS / "remote_sensing_unavailable.md"
     note.write_text(
-        """# Remote sensing data — unavailable in Phase C sandbox
+        """# Remote sensing data — not bundled
 
 ## What was attempted
 
@@ -85,18 +84,18 @@ def write_unavailability_note():
    spending many hours on raster ingestion.
 2. **MODIS MOD13Q1 NDVI** — NASA LPDAAC requires EarthData Login; Google
    Earth Engine requires service-account credentials. Neither is configured
-   in this sandbox.
+   in the local environment.
 3. **Pre-aggregated county NDVI from `resdc.cn`** — site is reachable but
    the dataset requires interactive login / form download; cannot be
    scripted automatically.
 
 ## Decision
 
-Per the sub-agent task instructions, when both NDVI and nightlight pipelines
-are unreachable we proceed with C1 only and leave the two RS columns as
-`NA` in the merged panel. The build script `build_remote_sensing_panel.py`
-emits a row-complete (county × year) skeleton with `ndvi_mean` and
-`nighttime_light_mean` set to NaN.
+When both NDVI and nightlight inputs are unavailable, the pipeline proceeds
+with C1 only and leaves the two RS columns as `NA` in the merged panel. The
+build script `build_remote_sensing_panel.py` emits a row-complete
+(county × year) skeleton with `ndvi_mean` and `nighttime_light_mean` set to
+NaN.
 
 ## What is needed to backfill
 
@@ -108,8 +107,8 @@ emits a row-complete (county × year) skeleton with `ndvi_mean` and
   MODIS NDVI 2015–2024.
 - About 8–12 GPU-free CPU hours per product to produce zonal means.
 
-Until then the Director should treat `ndvi_mean` / `nighttime_light_mean`
-as TBD; Phase D ecological-outcome regressions cannot use these columns yet.
+Until those inputs are backfilled, ecological-outcome regressions must not
+use `ndvi_mean` or `nighttime_light_mean`.
 """,
         encoding="utf-8",
     )

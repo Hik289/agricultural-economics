@@ -170,7 +170,7 @@ def main():
 
     df_out = pd.DataFrame(rows)
     df_out.to_csv(TAB / "table6_matching_did.csv", index=False)
-    log.append(f"\nMatching/EB results:")
+    log.append("\nMatching/EB results:")
     log.append(df_out.to_string(index=False))
     log.append(f"\nWrote {TAB / 'table6_matching_did.csv'}")
     (LOG / "d7.log").write_text("\n".join(log) + "\n")

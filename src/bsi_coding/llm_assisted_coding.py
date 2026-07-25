@@ -13,14 +13,13 @@ import csv
 import json
 import os
 import re
-import sys
 import time
 from pathlib import Path
 
 import requests
 from openai import OpenAI
 
-PROJECT_ROOT = Path("/home/user/projects/epvr-replication")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 PROCESSED = PROJECT_ROOT / "data" / "processed"
 
 PRIMARY_LLM_BASE_URL = os.environ.get("LLM_BASE_URL") or os.environ.get("OPENAI_BASE_URL")
