@@ -11,11 +11,15 @@ This repository contains replication code and analysis for the paper:
 
 We develop a **Benefit-Sharing Institution Index (BSI)** from 168 EPVR policy cases, construct a province-year panel (2015-2024), and estimate distributional effects using staggered difference-in-differences.
 
-## Repository Summary
+## At A Glance
 
-- **Scope.** How do benefit-sharing institutions shape distributional outcomes in China's EPVR markets?
-- **Method.** The replication package builds a Benefit-Sharing Institution Index and estimates staggered difference-in-differences effects.
-- **Contents.** Crawlers, BSI coding pipelines, panel construction, empirical estimators, robustness checks, and data-availability notes.
+| Artifact review question | Entry point |
+| --- | --- |
+| Research question | How do benefit-sharing institutions shape distributional outcomes in China's EPVR markets? |
+| Core method | The replication package builds a Benefit-Sharing Institution Index and estimates staggered difference-in-differences effects. |
+| Included artifacts | Crawlers, BSI coding pipelines, panel construction, empirical estimators, robustness checks, and data-availability notes. |
+| Fast validation | Run the empirical scripts on the companion processed data package. |
+| Paper-scale reproduction | Rebuild collection, BSI coding, panel construction, and DID analyses as described below. |
 
 ## Motivation
 
