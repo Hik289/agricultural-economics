@@ -26,23 +26,12 @@ from pathlib import Path
 from typing import Optional
 
 
-# Number-with-unit patterns.  Chinese bulletins write numbers in three styles:
-#   "12345.6 亿元"          (plain)
-#   "1,260,582 亿元"        (comma-grouped)
-#   "1260582 亿元"          (no grouping)
-# Order alternatives "comma-form first" so the comma-form is preferred when
-# both could match.
 NUM = r"((?:[0-9]{1,3}(?:[,，][0-9]{3})+)(?:\.[0-9]+)?|[0-9]+(?:\.[0-9]+)?)"
 # Currency / count units we may see — we normalize at extraction time.
 
 # --- canonical evidence patterns -------------------------------------------
 # Each rule is (var, [(pattern, scale_to_canonical_unit, kind)]).
 
-# For income (per capita): canonical unit = yuan.
-# Source phrases:
-#   农村居民人均可支配收入 21691 元
-#   农村常住居民人均可支配收入 21691.0元
-#   农村人均可支配收入 21691元
 RURAL_INCOME = [
     rf"(?:农村|农村常住|乡村)居民人均可支配收入(?:为|达|达到|约)?[^0-9]{{0,12}}{NUM}\s*元",
     rf"农村人均可支配收入(?:为|达|达到|约)?[^0-9]{{0,12}}{NUM}\s*元",
