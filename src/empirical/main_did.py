@@ -34,10 +34,6 @@ OUTCOMES = [
     "log_primary_industry_value_added",
 ]
 
-# Outcome-specific controls to avoid mechanical collinearity:
-#   - for log_gdp and log_primary_industry_value_added do NOT include
-#     log_primary_share (which is log(primary_VA) - log(gdp))
-#   - log_population_lag is always used when available
 def controls_for(outcome):
     base = ["log_population_lag"]
     if outcome in ("log_gdp", "log_primary_industry_value_added"):

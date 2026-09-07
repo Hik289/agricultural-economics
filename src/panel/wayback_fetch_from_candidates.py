@@ -160,10 +160,6 @@ def main() -> int:
                 h = host_of(u)
                 if not h or is_pref(h):
                     continue
-                # also skip jiangxi/sichuan/guizhou/shaanxi mirror cities
-                # heuristic: accept .gov.cn host whose subdomain prefix is
-                # "tjj.<prov>", "www.<prov>", "stjj.<prov>", or "stats.<prov>"
-                # plus aggregator hosts.
                 kept.append(u)
             if not kept:
                 log.append(f"[{code}/{y}] no candidates after filter"); print(f"[{code}/{y}] no candidates", flush=True)

@@ -87,10 +87,6 @@ ALLOWED_HOSTS_EXACT = {
     "nmt.nmg.gov.cn",  # 内蒙古自治区自然资源厅
 }
 
-# Patterns that we ALWAYS trust as provincial.
-# *zd.stats.gov.cn and *zdhd.stats.gov.cn are NBS provincial branches; the
-# prefix is the provincial abbreviation (zj, hn, sx, jl, …), not a
-# prefecture name.  So these are safe to auto-accept.
 ALLOWED_AUTO_PATTERNS = [
     re.compile(r"^[a-z]+zd\.stats\.gov\.cn$"),
     re.compile(r"^[a-z]+zdhd\.stats\.gov\.cn$"),

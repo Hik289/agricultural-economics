@@ -173,10 +173,6 @@ def m3(panel):
     rows = []
     for prov_code, prov_name in CAPTURE_RISK_HIGH.items():
         sub = panel[panel["province_code"] != prov_code].copy()
-        # Recompute the capture-risk-high median split after dropping the province,
-        # matching build_provincial_panel.py: median over treated provinces with
-        # non-missing capture_risk_mean_p, then flag > median. This implements the
-        # reviewer request to remove the province from the high-flag computation.
         cr_by_p = sub[["province_code", "capture_risk_mean_p"]].drop_duplicates()
         med_cr = cr_by_p["capture_risk_mean_p"].median()
         cr_flag = (cr_by_p.set_index("province_code")["capture_risk_mean_p"] > med_cr).astype(int)
@@ -233,10 +229,6 @@ def run_csdid_simple(panel, yname, shift=0):
     treated_mask = g_orig > 0
     g_shifted.loc[treated_mask] = (g_orig.loc[treated_mask] + shift).astype(int)
     tmax = int(df["year"].max())
-    # Match staggered_did.py for shift=0: only cohorts after the observed panel are
-    # reset to never-treated. Cohorts before the first observed year are left as-is;
-    # csdid then drops units already treated in the first period, which is the v2
-    # behavior and is important for reproducing table4b.
     g_shifted.loc[g_shifted > tmax] = 0
     df["gname"] = g_shifted
     df["province_code"] = df["province_code"].astype(int)
@@ -262,10 +254,6 @@ def run_csdid_simple(panel, yname, shift=0):
     inff = np.array(inff_obj["inffunc"]) if isinstance(inff_obj, dict) else np.array(inff_obj)
     n_units = mp["n"]
 
-    # Match src/empirical/staggered_did.py exactly for the simple ATT:
-    # post-treatment group-time ATTs are selected by t >= g and finite values.
-    # Do not add an extra g > 0 filter here, or shift=0 no longer reproduces
-    # the published v2 table4b simple ATT.
     post_mask = (t >= g) & np.isfinite(a)
     a_post = a[post_mask]
     if_post = inff[:, post_mask]

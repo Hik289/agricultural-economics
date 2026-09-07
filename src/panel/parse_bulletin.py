@@ -79,10 +79,6 @@ AGRI_OUTPUT = [
     rf"农林牧渔业总产值[^0-9]{{0,15}}{NUM}\s*亿元",
 ]
 
-# Population -- 万人 canonical.  Be careful: bulletins also mention
-# "城镇常住人口", "乡村人口", "出生人口", "死亡人口", "净增人口" — none of
-# those is the total.  We anchor on the strict total-population phrasings.
-# Allow optional footnote ref like [1].
 _FOOT = r"(?:\s*\[\s*\d+\s*\])*"
 POP_TOTAL = [
     rf"年末(?:全省|全市|全县|全国)?(?:常住|户籍)?总人口{_FOOT}\s*{NUM}\s*万人",
